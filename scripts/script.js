@@ -1,28 +1,38 @@
 //-------------------------------------------------
 //-------------------------------------------------
-//This function is to get the json data from the user
-//Then take the name and place it in the title 
-fetch("./data/config.json")
-.then(res=>res.json())
-.then(
-    config=>{
-        document.title=`${config.name}|CP-Folio`;
+// Get config, set title/branding/footer, and apply accent colors
+const isInPages = window.location.pathname.includes('/pages/');
+const CONFIG_URL = isInPages ? '../data/config.json' : './data/config.json';
+
+fetch(CONFIG_URL)
+    .then(res => res.json())
+    .then(config => {
+        const baseName = config.name || "CP-Folio";
+        const pageTitle = document.body?.dataset?.pageTitle || "CP-Folio";
+        document.title = `${pageTitle} | ${baseName}`;
+
         const footer = document.getElementById('footer-text');
-        const title_name=document.getElementById("username_ind");
-        if (title_name){
-            title_name.textContent=`${config.name} | `+title_name.textContent;
+        const titleName = document.getElementById("username_ind");
+        if (titleName) {
+            titleName.textContent = `${baseName} | CP-Folio`;
         }
         if (footer) {
-            footer.textContent = `© ${new Date().getFullYear()} ${config.name}`;
+            footer.textContent = `© ${new Date().getFullYear()} ${baseName}`;
         }
-    }
-)
-.catch(() => {
-    const footer = document.getElementById('footer-text');
-    if (footer) {
-        footer.textContent = `© ${new Date().getFullYear()} CP-Folio`;
-    }
-});
+
+        // Apply user accent color if provided
+        if (config.color) {
+            const root = document.documentElement;
+            root.style.setProperty('--accent', config.color);
+            root.style.setProperty('--accent-2', config.color);
+        }
+    })
+    .catch(() => {
+        const footer = document.getElementById('footer-text');
+        if (footer) {
+            footer.textContent = `© ${new Date().getFullYear()} CP-Folio`;
+        }
+    });
 //-------------------------------------------------
 //-------------------------------------------------
 
