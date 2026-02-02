@@ -1,11 +1,35 @@
 {
   "practice": [
-    { "path": "PRACTISE/hello_world.py", "label": "hello_world.py", "snippet": "Placeholder Python hello world." },
-    { "path": "PRACTISE/array_sum.cpp", "label": "array_sum.cpp", "snippet": "Sums an array in C++." },
-    { "path": "PRACTISE/stack_ops.java", "label": "stack_ops.java", "snippet": "Minimal stack check in Java." },
-    { "path": "PRACTISE/hashmap.js", "label": "hashmap.js", "snippet": "Counts tokens in JavaScript." },
-    { "path": "PRACTISE/prefix_check.ts", "label": "prefix_check.ts", "snippet": "Prefix check in TypeScript." },
-    { "path": "PRACTISE/greedy_walk.go", "label": "greedy_walk.go", "snippet": "Greedy walk in Go." }
+    {
+      "path": "PRACTISE/array_sum.cpp",
+      "label": "array_sum.cpp",
+      "snippet": ""
+    },
+    {
+      "path": "PRACTISE/greedy_walk.go",
+      "label": "greedy_walk.go",
+      "snippet": ""
+    },
+    {
+      "path": "PRACTISE/hashmap.js",
+      "label": "hashmap.js",
+      "snippet": ""
+    },
+    {
+      "path": "PRACTISE/hello_world.py",
+      "label": "hello_world.py",
+      "snippet": ""
+    },
+    {
+      "path": "PRACTISE/prefix_check.ts",
+      "label": "prefix_check.ts",
+      "snippet": ""
+    },
+    {
+      "path": "PRACTISE/stack_ops.java",
+      "label": "stack_ops.java",
+      "snippet": ""
+    }
   ],
   "contests": [
     {
@@ -13,8 +37,16 @@
       "folder": "CONTESTS/CONTEST-1",
       "meta": "CONTESTS/CONTEST-1/meta.json",
       "problems": [
-        { "path": "CONTESTS/CONTEST-1/round1_a.py", "label": "round1_a.py", "snippet": "Contest 1 Python placeholder." },
-        { "path": "CONTESTS/CONTEST-1/round1_b.cpp", "label": "round1_b.cpp", "snippet": "Contest 1 C++ placeholder." }
+        {
+          "path": "CONTESTS/CONTEST-1/round1_a.py",
+          "label": "round1_a.py",
+          "snippet": ""
+        },
+        {
+          "path": "CONTESTS/CONTEST-1/round1_b.cpp",
+          "label": "round1_b.cpp",
+          "snippet": ""
+        }
       ]
     },
     {
@@ -22,8 +54,16 @@
       "folder": "CONTESTS/CONTEST-2",
       "meta": "CONTESTS/CONTEST-2/meta.json",
       "problems": [
-        { "path": "CONTESTS/CONTEST-2/round2_a.rs", "label": "round2_a.rs", "snippet": "Contest 2 Rust placeholder." },
-        { "path": "CONTESTS/CONTEST-2/round2_b.kt", "label": "round2_b.kt", "snippet": "Contest 2 Kotlin placeholder." }
+        {
+          "path": "CONTESTS/CONTEST-2/round2_a.rs",
+          "label": "round2_a.rs",
+          "snippet": ""
+        },
+        {
+          "path": "CONTESTS/CONTEST-2/round2_b.kt",
+          "label": "round2_b.kt",
+          "snippet": ""
+        }
       ]
     },
     {
@@ -31,8 +71,16 @@
       "folder": "CONTESTS/CONTEST-3",
       "meta": "CONTESTS/CONTEST-3/meta.json",
       "problems": [
-        { "path": "CONTESTS/CONTEST-3/round3_a.cs", "label": "round3_a.cs", "snippet": "Contest 3 C# placeholder." },
-        { "path": "CONTESTS/CONTEST-3/round3_b.swift", "label": "round3_b.swift", "snippet": "Contest 3 Swift placeholder." }
+        {
+          "path": "CONTESTS/CONTEST-3/round3_a.cs",
+          "label": "round3_a.cs",
+          "snippet": ""
+        },
+        {
+          "path": "CONTESTS/CONTEST-3/round3_b.swift",
+          "label": "round3_b.swift",
+          "snippet": ""
+        }
       ]
     }
   ],
@@ -42,8 +90,16 @@
       "folder": "SPRINTS/SPRINT-BLOCK-1",
       "meta": "SPRINTS/SPRINT-BLOCK-1/meta.json",
       "problems": [
-        { "path": "SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py", "label": "sprint1_task_a.py", "snippet": "Sprint block 1 Python placeholder." },
-        { "path": "SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp", "label": "sprint1_task_b.cpp", "snippet": "Sprint block 1 C++ placeholder." }
+        {
+          "path": "SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py",
+          "label": "sprint1_task_a.py",
+          "snippet": ""
+        },
+        {
+          "path": "SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp",
+          "label": "sprint1_task_b.cpp",
+          "snippet": ""
+        }
       ]
     },
     {
@@ -51,34 +107,54 @@
       "folder": "SPRINTS/SPRINT-BLOCK-2",
       "meta": "SPRINTS/SPRINT-BLOCK-2/meta.json",
       "problems": [
-        { "path": "SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java", "label": "sprint2_task_a.java", "snippet": "Sprint block 2 Java placeholder." },
-        { "path": "SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts", "label": "sprint2_task_b.ts", "snippet": "Sprint block 2 TypeScript placeholder." }
+        {
+          "path": "SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java",
+          "label": "sprint2_task_a.java",
+          "snippet": ""
+        },
+        {
+          "path": "SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts",
+          "label": "sprint2_task_b.ts",
+          "snippet": ""
+        }
       ]
     }
   ],
   "virtual": [
     {
-      "title": "VIRTUAL-CONTEST-1",
+      "title": "CONTEST-1",
       "folder": "VIRTUAL-CONTESTS/CONTEST-1",
       "meta": "VIRTUAL-CONTESTS/CONTEST-1/meta.json",
       "problems": [
-        { "path": "VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py", "label": "virtual1_a.py", "snippet": "Virtual contest 1 Python placeholder." }
+        {
+          "path": "VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py",
+          "label": "virtual1_a.py",
+          "snippet": ""
+        }
       ]
     },
     {
-      "title": "VIRTUAL-CONTEST-2",
+      "title": "CONTEST-2",
       "folder": "VIRTUAL-CONTESTS/CONTEST-2",
       "meta": "VIRTUAL-CONTESTS/CONTEST-2/meta.json",
       "problems": [
-        { "path": "VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp", "label": "virtual2_a.cpp", "snippet": "Virtual contest 2 C++ placeholder." }
+        {
+          "path": "VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp",
+          "label": "virtual2_a.cpp",
+          "snippet": ""
+        }
       ]
     },
     {
-      "title": "VIRTUAL-CONTEST-3",
+      "title": "CONTEST-3",
       "folder": "VIRTUAL-CONTESTS/CONTEST-3",
       "meta": "VIRTUAL-CONTESTS/CONTEST-3/meta.json",
       "problems": [
-        { "path": "VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go", "label": "virtual3_a.go", "snippet": "Virtual contest 3 Go placeholder." }
+        {
+          "path": "VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go",
+          "label": "virtual3_a.go",
+          "snippet": ""
+        }
       ]
     }
   ]
