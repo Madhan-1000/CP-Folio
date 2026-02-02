@@ -1,47 +1,57 @@
 //-------------------------------------------------
 //-------------------------------------------------
-// Get config, set title/branding/footer, and apply accent colors
+// Config + manifest loader (dynamic instead of hardcoded lists)
 const isInPages = window.location.pathname.includes('/pages/');
 const CONFIG_URL = isInPages ? '../data/config.json' : './data/config.json';
+const MANIFEST_URL = isInPages ? '../data/manifest.json' : './data/manifest.json';
 const pageTitle = document.body?.dataset?.pageTitle || 'CP-Folio';
 const PATH_PREFIX = isInPages ? '../' : './';
 
-fetch(CONFIG_URL)
+let codeRoot = 'CP-CODE';
+
+const applyConfig = config => {
+    const baseName = config.name || 'CP-Folio';
+    document.title = `${pageTitle} | ${baseName}`;
+
+    const footer = document.getElementById('footer-text');
+    const titleName = document.getElementById('username_ind');
+    if (titleName) {
+        titleName.textContent = `${baseName} | CP-Folio`;
+    }
+    if (footer) {
+        footer.textContent = `© ${new Date().getFullYear()} ${baseName}`;
+    }
+
+    const cfLink = document.getElementById('cf-profile-link');
+    if (cfLink && config.codeforces_account) {
+        cfLink.href = config.codeforces_account;
+    }
+
+    if (config.color) {
+        const root = document.documentElement;
+        root.style.setProperty('--accent', config.color);
+        root.style.setProperty('--accent-2', config.color);
+        root.style.setProperty('--primary', config.color);
+        root.style.setProperty('--secondary', config.color);
+    }
+
+    codeRoot = config.codeRoot || codeRoot;
+};
+
+const loadConfig = () => fetch(CONFIG_URL)
     .then(res => res.json())
-    .then(config => {
-        const baseName = config.name || "CP-Folio";
-        document.title = `${pageTitle} | ${baseName}`;
-
-        const footer = document.getElementById('footer-text');
-        const titleName = document.getElementById("username_ind");
-        if (titleName) {
-            titleName.textContent = `${baseName} | CP-Folio`;
-        }
-        if (footer) {
-            footer.textContent = `© ${new Date().getFullYear()} ${baseName}`;
-        }
-
-        // Codeforces profile link from config
-        const cfLink = document.getElementById('cf-profile-link');
-        if (cfLink && config.codeforces_account) {
-            cfLink.href = config.codeforces_account;
-        }
-
-        // Apply user accent color if provided
-        if (config.color) {
-            const root = document.documentElement;
-            root.style.setProperty('--accent', config.color);
-            root.style.setProperty('--accent-2', config.color);
-            root.style.setProperty('--primary', config.color);
-            root.style.setProperty('--secondary', config.color);
-        }
-    })
+    .then(cfg => { applyConfig(cfg); return cfg; })
     .catch(() => {
         const footer = document.getElementById('footer-text');
         if (footer) {
             footer.textContent = `© ${new Date().getFullYear()} CP-Folio`;
         }
+        return { codeRoot };
     });
+
+const loadManifest = () => fetch(MANIFEST_URL)
+    .then(res => (res.ok ? res.json() : null))
+    .catch(() => null);
 //-------------------------------------------------
 //-------------------------------------------------
 
@@ -53,83 +63,88 @@ const isSprintPage = pageTitle === 'Sprints';
 const isVirtualPage = pageTitle === 'Virtual Contests';
 const isSectionPage = pageTitle === 'Section';
 const isAllPage = pageTitle === 'All';
+// Defaults (used as fallback when manifest is missing)
+const defaultData = {
+    practiceProblems: [
+        'CP-CODE/PRACTISE/hello_world.py',
+        'CP-CODE/PRACTISE/array_sum.cpp',
+        'CP-CODE/PRACTISE/stack_ops.java',
+        'CP-CODE/PRACTISE/hashmap.js',
+        'CP-CODE/PRACTISE/prefix_check.ts',
+        'CP-CODE/PRACTISE/greedy_walk.go',
+    ],
+    contestProblems: [
+        'CP-CODE/CONTESTS/CONTEST-1/round1_a.py',
+        'CP-CODE/CONTESTS/CONTEST-1/round1_b.cpp',
+        'CP-CODE/CONTESTS/CONTEST-2/round2_a.rs',
+        'CP-CODE/CONTESTS/CONTEST-2/round2_b.kt',
+        'CP-CODE/CONTESTS/CONTEST-3/round3_a.cs',
+        'CP-CODE/CONTESTS/CONTEST-3/round3_b.swift',
+    ],
+    sprintProblems: [
+        'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py',
+        'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp',
+        'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java',
+        'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts',
+    ],
+    virtualProblems: [
+        'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py',
+        'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp',
+        'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go',
+    ],
+    contestSections: [
+        { title: 'CONTEST-1', path: 'CP-CODE/CONTESTS/CONTEST-1/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-1' },
+        { title: 'CONTEST-2', path: 'CP-CODE/CONTESTS/CONTEST-2/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-2' },
+        { title: 'CONTEST-3', path: 'CP-CODE/CONTESTS/CONTEST-3/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-3' },
+    ],
+    sprintSections: [
+        { title: 'SPRINT-BLOCK-1', path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/meta.json', folder: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1' },
+        { title: 'SPRINT-BLOCK-2', path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/meta.json', folder: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2' },
+    ],
+    virtualSections: [
+        { title: 'VIRTUAL-CONTEST-1', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1' },
+        { title: 'VIRTUAL-CONTEST-2', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2' },
+        { title: 'VIRTUAL-CONTEST-3', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3' },
+    ],
+    practiceList: [
+        { path: 'CP-CODE/PRACTISE/hello_world.py', label: 'hello_world.py', snippet: 'Placeholder Python hello world.' },
+        { path: 'CP-CODE/PRACTISE/array_sum.cpp', label: 'array_sum.cpp', snippet: 'Sums an array in C++.' },
+        { path: 'CP-CODE/PRACTISE/stack_ops.java', label: 'stack_ops.java', snippet: 'Minimal stack check in Java.' },
+        { path: 'CP-CODE/PRACTISE/hashmap.js', label: 'hashmap.js', snippet: 'Counts tokens in JavaScript.' },
+        { path: 'CP-CODE/PRACTISE/prefix_check.ts', label: 'prefix_check.ts', snippet: 'Prefix check in TypeScript.' },
+    ],
+    contestList: [
+        { path: 'CP-CODE/CONTESTS/CONTEST-3/round3_b.swift', label: 'round3_b.swift', snippet: 'Contest 3 Swift placeholder.' },
+        { path: 'CP-CODE/CONTESTS/CONTEST-3/round3_a.cs', label: 'round3_a.cs', snippet: 'Contest 3 C# placeholder.' },
+        { path: 'CP-CODE/CONTESTS/CONTEST-2/round2_b.kt', label: 'round2_b.kt', snippet: 'Contest 2 Kotlin placeholder.' },
+        { path: 'CP-CODE/CONTESTS/CONTEST-1/round1_a.py', label: 'round1_a.py', snippet: 'Contest 1 Python placeholder.' },
+    ],
+    virtualList: [
+        { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go', label: 'virtual3_a.go', snippet: 'Virtual contest 3 Go placeholder.' },
+        { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp', label: 'virtual2_a.cpp', snippet: 'Virtual contest 2 C++ placeholder.' },
+        { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py', label: 'virtual1_a.py', snippet: 'Virtual contest 1 Python placeholder.' },
+    ],
+    sprintList: [
+        { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts', label: 'sprint2_task_b.ts', snippet: 'Sprint block 2 TypeScript placeholder.' },
+        { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java', label: 'sprint2_task_a.java', snippet: 'Sprint block 2 Java placeholder.' },
+        { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp', label: 'sprint1_task_b.cpp', snippet: 'Sprint block 1 C++ placeholder.' },
+        { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py', label: 'sprint1_task_a.py', snippet: 'Sprint block 1 Python placeholder.' },
+    ],
+};
 
-// Canonical problem lists (paths relative to project root)
-const practiceProblems = [
-    'CP-CODE/PRACTISE/hello_world.py',
-    'CP-CODE/PRACTISE/array_sum.cpp',
-    'CP-CODE/PRACTISE/stack_ops.java',
-    'CP-CODE/PRACTISE/hashmap.js',
-    'CP-CODE/PRACTISE/prefix_check.ts',
-    'CP-CODE/PRACTISE/greedy_walk.go',
-];
+let practiceProblems = [...defaultData.practiceProblems];
+let contestProblems = [...defaultData.contestProblems];
+let sprintProblems = [...defaultData.sprintProblems];
+let virtualProblems = [...defaultData.virtualProblems];
 
-const contestProblems = [
-    'CP-CODE/CONTESTS/CONTEST-1/round1_a.py',
-    'CP-CODE/CONTESTS/CONTEST-1/round1_b.cpp',
-    'CP-CODE/CONTESTS/CONTEST-2/round2_a.rs',
-    'CP-CODE/CONTESTS/CONTEST-2/round2_b.kt',
-    'CP-CODE/CONTESTS/CONTEST-3/round3_a.cs',
-    'CP-CODE/CONTESTS/CONTEST-3/round3_b.swift',
-];
+let contestSections = [...defaultData.contestSections];
+let sprintSections = [...defaultData.sprintSections];
+let virtualSections = [...defaultData.virtualSections];
 
-const sprintProblems = [
-    'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py',
-    'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp',
-    'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java',
-    'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts',
-];
-
-const virtualProblems = [
-    'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py',
-    'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp',
-    'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go',
-];
-
-const contestSections = [
-    { title: 'CONTEST-1', path: 'CP-CODE/CONTESTS/CONTEST-1/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-1' },
-    { title: 'CONTEST-2', path: 'CP-CODE/CONTESTS/CONTEST-2/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-2' },
-    { title: 'CONTEST-3', path: 'CP-CODE/CONTESTS/CONTEST-3/meta.json', folder: 'CP-CODE/CONTESTS/CONTEST-3' },
-];
-
-const sprintSections = [
-    { title: 'SPRINT-BLOCK-1', path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/meta.json', folder: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1' },
-    { title: 'SPRINT-BLOCK-2', path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/meta.json', folder: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2' },
-];
-
-const virtualSections = [
-    { title: 'VIRTUAL-CONTEST-1', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1' },
-    { title: 'VIRTUAL-CONTEST-2', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2' },
-    { title: 'VIRTUAL-CONTEST-3', path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/meta.json', folder: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3' },
-];
-
-const practiceList = [
-    { path: 'CP-CODE/PRACTISE/hello_world.py', label: 'hello_world.py', snippet: 'Placeholder Python hello world.' },
-    { path: 'CP-CODE/PRACTISE/array_sum.cpp', label: 'array_sum.cpp', snippet: 'Sums an array in C++.' },
-    { path: 'CP-CODE/PRACTISE/stack_ops.java', label: 'stack_ops.java', snippet: 'Minimal stack check in Java.' },
-    { path: 'CP-CODE/PRACTISE/hashmap.js', label: 'hashmap.js', snippet: 'Counts tokens in JavaScript.' },
-    { path: 'CP-CODE/PRACTISE/prefix_check.ts', label: 'prefix_check.ts', snippet: 'Prefix check in TypeScript.' },
-];
-
-const contestList = [
-    { path: 'CP-CODE/CONTESTS/CONTEST-3/round3_b.swift', label: 'round3_b.swift', snippet: 'Contest 3 Swift placeholder.' },
-    { path: 'CP-CODE/CONTESTS/CONTEST-3/round3_a.cs', label: 'round3_a.cs', snippet: 'Contest 3 C# placeholder.' },
-    { path: 'CP-CODE/CONTESTS/CONTEST-2/round2_b.kt', label: 'round2_b.kt', snippet: 'Contest 2 Kotlin placeholder.' },
-    { path: 'CP-CODE/CONTESTS/CONTEST-1/round1_a.py', label: 'round1_a.py', snippet: 'Contest 1 Python placeholder.' },
-];
-
-const virtualList = [
-    { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-3/virtual3_a.go', label: 'virtual3_a.go', snippet: 'Virtual contest 3 Go placeholder.' },
-    { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-2/virtual2_a.cpp', label: 'virtual2_a.cpp', snippet: 'Virtual contest 2 C++ placeholder.' },
-    { path: 'CP-CODE/VIRTUAL-CONTESTS/CONTEST-1/virtual1_a.py', label: 'virtual1_a.py', snippet: 'Virtual contest 1 Python placeholder.' },
-];
-
-const sprintList = [
-    { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_b.ts', label: 'sprint2_task_b.ts', snippet: 'Sprint block 2 TypeScript placeholder.' },
-    { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-2/sprint2_task_a.java', label: 'sprint2_task_a.java', snippet: 'Sprint block 2 Java placeholder.' },
-    { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_b.cpp', label: 'sprint1_task_b.cpp', snippet: 'Sprint block 1 C++ placeholder.' },
-    { path: 'CP-CODE/SPRINTS/SPRINT-BLOCK-1/sprint1_task_a.py', label: 'sprint1_task_a.py', snippet: 'Sprint block 1 Python placeholder.' },
-];
+let practiceList = [...defaultData.practiceList];
+let contestList = [...defaultData.contestList];
+let virtualList = [...defaultData.virtualList];
+let sprintList = [...defaultData.sprintList];
 
 const takeFirstN = (arr, n = 4) => arr.slice(0, n);
 const normalizePath = path => (path.startsWith('./') ? path.slice(2) : path);
@@ -141,7 +156,7 @@ const makeViewerLink = path => {
     return `${viewerBase}?file=${encodeURIComponent(clean)}`;
 };
 
-const allProblems = [
+let allProblems = [
     ...practiceProblems,
     ...contestProblems,
     ...sprintProblems,
@@ -298,6 +313,103 @@ const extLabels = {
     swift: 'Swift',
 };
 
+const qualifyPath = rel => {
+    const clean = normalizePath(rel);
+    return clean.startsWith(`${codeRoot}/`) ? clean : normalizePath(`${codeRoot}/${clean}`);
+};
+
+const fileLabel = path => normalizePath(path).split('/').pop();
+
+const applyManifestData = manifest => {
+    if (!manifest) {
+        allProblems = [
+            ...practiceProblems,
+            ...contestProblems,
+            ...sprintProblems,
+            ...virtualProblems,
+        ];
+        return;
+    }
+
+    const practice = Array.isArray(manifest.practice) ? manifest.practice : [];
+    if (practice.length) {
+        practiceProblems = practice.map(item => qualifyPath(item.path || item));
+        practiceList = practice.map(item => ({
+            path: qualifyPath(item.path || item),
+            label: item.label || fileLabel(item.path || item),
+            snippet: item.snippet || 'Practice placeholder.',
+        }));
+    }
+
+    const buildSectionData = (sections = []) => sections.map(section => {
+        const folder = qualifyPath(section.folder || '');
+        const metaPath = section.meta ? qualifyPath(section.meta) : `${folder}/meta.json`;
+        const problems = Array.isArray(section.problems) ? section.problems : [];
+        const problemPaths = problems.map(p => qualifyPath(p.path || p));
+        const listEntries = problems.map(p => ({
+            path: qualifyPath(p.path || p),
+            label: p.label || fileLabel(p.path || p),
+            snippet: p.snippet || 'Problem placeholder.',
+        }));
+        return {
+            title: section.title || folder.split('/').pop(),
+            folder,
+            path: metaPath,
+            problems: problemPaths,
+            listEntries,
+        };
+    });
+
+    const contestData = buildSectionData(manifest.contests);
+    if (contestData.length) {
+        contestSections = contestData.map(({ title, path, folder }) => ({ title, path, folder }));
+        contestProblems = contestData.flatMap(s => s.problems);
+        contestList = contestData.flatMap(s => s.listEntries);
+    }
+
+    const sprintData = buildSectionData(manifest.sprints);
+    if (sprintData.length) {
+        sprintSections = sprintData.map(({ title, path, folder }) => ({ title, path, folder }));
+        sprintProblems = sprintData.flatMap(s => s.problems);
+        sprintList = sprintData.flatMap(s => s.listEntries);
+    }
+
+    const virtualData = buildSectionData(manifest.virtual);
+    if (virtualData.length) {
+        virtualSections = virtualData.map(({ title, path, folder }) => ({ title, path, folder }));
+        virtualProblems = virtualData.flatMap(s => s.problems);
+        virtualList = virtualData.flatMap(s => s.listEntries);
+    }
+
+    // Fall back to defaults when any bucket is empty
+    if (!practiceProblems.length) {
+        practiceProblems = [...defaultData.practiceProblems];
+        practiceList = [...defaultData.practiceList];
+    }
+    if (!contestProblems.length) {
+        contestProblems = [...defaultData.contestProblems];
+        contestList = [...defaultData.contestList];
+        contestSections = [...defaultData.contestSections];
+    }
+    if (!sprintProblems.length) {
+        sprintProblems = [...defaultData.sprintProblems];
+        sprintList = [...defaultData.sprintList];
+        sprintSections = [...defaultData.sprintSections];
+    }
+    if (!virtualProblems.length) {
+        virtualProblems = [...defaultData.virtualProblems];
+        virtualList = [...defaultData.virtualList];
+        virtualSections = [...defaultData.virtualSections];
+    }
+
+    allProblems = [
+        ...practiceProblems,
+        ...contestProblems,
+        ...sprintProblems,
+        ...virtualProblems,
+    ];
+};
+
 const buildLangBreakdown = paths => {
     const tally = {};
     paths.forEach(p => {
@@ -371,145 +483,153 @@ const applyCountsAndLangBars = (practiceExisting, contestExisting, sprintExistin
 const langBarIds = ['lang-overall', 'lang-practice', 'lang-contest', 'lang-sprint', 'lang-virtual', 'section-lang-bar'];
 const needsLangBars = langBarIds.some(id => document.getElementById(id));
 
-if (needsCounts || needsLangBars) {
-    Promise.all([
-        checkExisting(practiceProblems),
-        checkExisting(contestProblems),
-        checkExisting(sprintProblems),
-        checkExisting(virtualProblems),
-    ]).then(([practiceRes, contestRes, sprintRes, virtualRes]) => {
-        const practiceExisting = practiceRes.filter(r => r.exists).map(r => r.path);
-        const contestExisting = contestRes.filter(r => r.exists).map(r => r.path);
-        const sprintExisting = sprintRes.filter(r => r.exists).map(r => r.path);
-        const virtualExisting = virtualRes.filter(r => r.exists).map(r => r.path);
+const runPageSetup = () => {
+    if (needsCounts || needsLangBars) {
+        Promise.all([
+            checkExisting(practiceProblems),
+            checkExisting(contestProblems),
+            checkExisting(sprintProblems),
+            checkExisting(virtualProblems),
+        ]).then(([practiceRes, contestRes, sprintRes, virtualRes]) => {
+            const practiceExisting = practiceRes.filter(r => r.exists).map(r => r.path);
+            const contestExisting = contestRes.filter(r => r.exists).map(r => r.path);
+            const sprintExisting = sprintRes.filter(r => r.exists).map(r => r.path);
+            const virtualExisting = virtualRes.filter(r => r.exists).map(r => r.path);
 
-        applyCountsAndLangBars(practiceExisting, contestExisting, sprintExisting, virtualExisting);
-    });
-}
-
-// Section detail page: render problems within a folder
-if (isSectionPage) {
-    const params = new URLSearchParams(window.location.search);
-    const folderParam = params.get('folder');
-    const displayTitle = params.get('title');
-    const folder = folderParam ? normalizePath(folderParam) : '';
-
-    const titleEl = document.getElementById('section-title');
-    const subtitleEl = document.getElementById('section-subtitle');
-
-    if (titleEl && displayTitle) titleEl.textContent = displayTitle;
-    if (subtitleEl) subtitleEl.textContent = folder ? folder : 'No folder specified';
-
-    const metaPath = folder ? `${folder}/meta.json` : '';
-    if (metaPath) {
-        fetch(withBase(metaPath))
-            .then(res => res.ok ? res.json() : null)
-            .then(meta => {
-                if (!meta) return;
-                const metaBits = [];
-                if (meta.title) metaBits.push(meta.title);
-                if (meta.platform) metaBits.push(meta.platform.toUpperCase());
-                if (meta.id) metaBits.push(`ID: ${meta.id}`);
-                if (meta.date) metaBits.push(meta.date);
-                if (titleEl && meta.title) titleEl.textContent = meta.title;
-                if (subtitleEl && metaBits.length) subtitleEl.textContent = metaBits.join(' • ');
-            })
-            .catch(() => {});
+            applyCountsAndLangBars(practiceExisting, contestExisting, sprintExisting, virtualExisting);
+        });
     }
 
-    const sectionProblems = filterProblemsByFolder(folder);
-    attachSearch('section-search', sectionProblems, 'section-grid', filtered => {
-        updateStat('section-count', filtered.length);
-        renderLangBar('section-lang-bar', 'section-lang-legend', buildLangBreakdown(filtered));
-    });
-}
+    if (isSectionPage) {
+        const params = new URLSearchParams(window.location.search);
+        const folderParam = params.get('folder');
+        const displayTitle = params.get('title');
+        const folder = folderParam ? normalizePath(folderParam) : '';
 
-// Home stats (only on root page)
-if (isHomePage) {
-    renderList(takeFirstN(practiceList), 'recent-practice');
-    renderList(takeFirstN(contestList), 'recent-contests');
-    renderList(takeFirstN(virtualList), 'recent-virtual');
-    renderList(takeFirstN(sprintList), 'recent-sprints');
-}
+        const titleEl = document.getElementById('section-title');
+        const subtitleEl = document.getElementById('section-subtitle');
 
-// Practice/Contest/Sprint/Virtual listing pages
-if (isPracticePage) {
-    attachSearch('practice-search', practiceProblems, 'practice-grid');
-}
+        if (titleEl && displayTitle) titleEl.textContent = displayTitle;
+        if (subtitleEl) subtitleEl.textContent = folder ? folder : 'No folder specified';
 
-if (isContestPage) {
-    renderSectionCards(contestSections, 'contest-section-grid');
-    attachSearch('contest-search', contestProblems, 'contest-grid');
-}
-
-if (isSprintPage) {
-    renderSectionCards(sprintSections, 'sprint-section-grid');
-    attachSearch('sprint-search', sprintProblems, 'sprint-grid');
-}
-
-if (isVirtualPage) {
-    renderSectionCards(virtualSections, 'virtual-section-grid');
-    attachSearch('virtual-search', virtualProblems, 'virtual-grid');
-}
-
-if (isAllPage) {
-    attachSearch('all-search', allProblems, 'all-grid');
-}
-
-// Viewer page logic: fetch and render code with optional highlighting
-if (isViewerPage) {
-    const params = new URLSearchParams(window.location.search);
-    const rawFile = params.get('file');
-    const filenameEl = document.getElementById('viewer-filename');
-    const codeEl = document.getElementById('viewer-code');
-    const errorEl = document.getElementById('viewer-error');
-    const copyBtn = document.getElementById('copy-btn');
-
-    const showError = msg => {
-        if (errorEl) {
-            errorEl.textContent = msg;
-            errorEl.style.display = 'block';
+        const metaPath = folder ? `${folder}/meta.json` : '';
+        if (metaPath) {
+            fetch(withBase(metaPath))
+                .then(res => res.ok ? res.json() : null)
+                .then(meta => {
+                    if (!meta) return;
+                    const metaBits = [];
+                    if (meta.title) metaBits.push(meta.title);
+                    if (meta.platform) metaBits.push(meta.platform.toUpperCase());
+                    if (meta.id) metaBits.push(`ID: ${meta.id}`);
+                    if (meta.date) metaBits.push(meta.date);
+                    if (titleEl && meta.title) titleEl.textContent = meta.title;
+                    if (subtitleEl && metaBits.length) subtitleEl.textContent = metaBits.join(' • ');
+                })
+                .catch(() => {});
         }
-    };
 
-    if (!rawFile || !(rawFile.startsWith('./CP-CODE/') || rawFile.startsWith('CP-CODE/'))) {
-        if (filenameEl) filenameEl.textContent = 'Invalid file';
-        showError('Invalid or missing file parameter.');
-    } else {
-        const cleanPath = normalizePath(rawFile);
-        const fetchPath = `${PATH_PREFIX}${cleanPath}`;
-        if (filenameEl) filenameEl.textContent = cleanPath;
+        const sectionProblems = filterProblemsByFolder(folder);
+        attachSearch('section-search', sectionProblems, 'section-grid', filtered => {
+            updateStat('section-count', filtered.length);
+            renderLangBar('section-lang-bar', 'section-lang-legend', buildLangBreakdown(filtered));
+        });
+    }
 
-        fetch(fetchPath)
-            .then(res => {
-                if (!res.ok) throw new Error(`Failed to load file (${res.status})`);
-                return res.text();
-            })
-            .then(text => {
-                if (codeEl) {
-                    codeEl.textContent = text;
-                    if (window.hljs) {
-                        window.hljs.highlightElement(codeEl);
+    if (isHomePage) {
+        renderList(takeFirstN(practiceList), 'recent-practice');
+        renderList(takeFirstN(contestList), 'recent-contests');
+        renderList(takeFirstN(virtualList), 'recent-virtual');
+        renderList(takeFirstN(sprintList), 'recent-sprints');
+    }
+
+    if (isPracticePage) {
+        attachSearch('practice-search', practiceProblems, 'practice-grid');
+    }
+
+    if (isContestPage) {
+        renderSectionCards(contestSections, 'contest-section-grid');
+        attachSearch('contest-search', contestProblems, 'contest-grid');
+    }
+
+    if (isSprintPage) {
+        renderSectionCards(sprintSections, 'sprint-section-grid');
+        attachSearch('sprint-search', sprintProblems, 'sprint-grid');
+    }
+
+    if (isVirtualPage) {
+        renderSectionCards(virtualSections, 'virtual-section-grid');
+        attachSearch('virtual-search', virtualProblems, 'virtual-grid');
+    }
+
+    if (isAllPage) {
+        attachSearch('all-search', allProblems, 'all-grid');
+    }
+
+    if (isViewerPage) {
+        const params = new URLSearchParams(window.location.search);
+        const rawFile = params.get('file');
+        const filenameEl = document.getElementById('viewer-filename');
+        const codeEl = document.getElementById('viewer-code');
+        const errorEl = document.getElementById('viewer-error');
+        const copyBtn = document.getElementById('copy-btn');
+
+        const showError = msg => {
+            if (errorEl) {
+                errorEl.textContent = msg;
+                errorEl.style.display = 'block';
+            }
+        };
+
+        const rootPrefix = `${codeRoot}/`;
+        if (!rawFile || !(rawFile.startsWith(`./${rootPrefix}`) || rawFile.startsWith(rootPrefix))) {
+            if (filenameEl) filenameEl.textContent = 'Invalid file';
+            showError('Invalid or missing file parameter.');
+        } else {
+            const cleanPath = normalizePath(rawFile);
+            const fetchPath = `${PATH_PREFIX}${cleanPath}`;
+            if (filenameEl) filenameEl.textContent = cleanPath;
+
+            fetch(fetchPath)
+                .then(res => {
+                    if (!res.ok) throw new Error(`Failed to load file (${res.status})`);
+                    return res.text();
+                })
+                .then(text => {
+                    if (codeEl) {
+                        codeEl.textContent = text;
+                        if (window.hljs) {
+                            window.hljs.highlightElement(codeEl);
+                        }
                     }
-                }
-            })
-            .catch(err => {
-                showError(err.message);
-            });
+                })
+                .catch(err => {
+                    showError(err.message);
+                });
 
-        if (copyBtn) {
-            copyBtn.addEventListener('click', () => {
-                if (!codeEl) return;
-                navigator.clipboard.writeText(codeEl.textContent || '')
-                    .then(() => {
-                        copyBtn.textContent = 'Copied';
-                        setTimeout(() => (copyBtn.textContent = 'Copy'), 1200);
-                    })
-                    .catch(() => showError('Unable to copy content.'));
-            });
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    if (!codeEl) return;
+                    navigator.clipboard.writeText(codeEl.textContent || '')
+                        .then(() => {
+                            copyBtn.textContent = 'Copied';
+                            setTimeout(() => (copyBtn.textContent = 'Copy'), 1200);
+                        })
+                        .catch(() => showError('Unable to copy content.'));
+                });
+            }
         }
     }
-}
+};
+
+const start = async () => {
+    await loadConfig();
+    const manifest = await loadManifest();
+    applyManifestData(manifest);
+    runPageSetup();
+};
+
+start();
 
 // Mobile navigation toggle
 const navToggle = document.querySelector('.nav-toggle');

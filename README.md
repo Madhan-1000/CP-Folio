@@ -15,15 +15,26 @@ Lightweight, static site to browse your competitive programming solutions. Every
 1) Fork + clone.
 2) Fill `data/config.json` with your info.
 3) Swap placeholder files in `CP-CODE/` with your solutions.
-4) Update the lists in `scripts/script.js` (practiceList, contestList, sprintList, virtualList) to point to your files.
+4) Run the manifest builder so the site auto-picks your files:
+```bash
+node tools/build-manifest.js
+```
 5) Open `index.html` or run a tiny server (`python -m http.server 8000`) and visit `http://localhost:8000`.
 
 ## Visual guide (assets)
 - Edit config: ![config_json](assets/config_json.png)
 
 ## Add problems
-- Add the files into the `CP-CODE` subfolder as required.
-- Add one entry to the matching array in `scripts/script.js` with the path and a short label/snippet.
+- Add the files into the right `CP-CODE` subfolder.
+- Run `node tools/build-manifest.js` to refresh `data/manifest.json` (no manual edits needed).
+
+## Regenerate manifest (auto)
+```bash
+node tools/build-manifest.js
+```
+This scans `CP-CODE` (practice, contests, sprints, virtual), reads each folder’s `meta.json`, and writes `data/manifest.json`. No hardcoded paths or manual list edits.
+
+GitHub Actions: on every push to `main`, `.github/workflows/build-manifest.yml` runs the same script and commits an updated `data/manifest.json` if files changed.
 
 ## Theme
 - Tweak the CSS variables at the top of `static/style.css` for colors.
@@ -37,9 +48,11 @@ Lightweight, static site to browse your competitive programming solutions. Every
 ## Key files (at a glance)
 ```bash
 data/config.json
+data/manifest.json
 scripts/script.js
 static/style.css
 pages/
+tools/build-manifest.js
 ```
 
 ## Default structure
