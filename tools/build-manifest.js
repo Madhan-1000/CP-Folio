@@ -1,12 +1,25 @@
 const fs = require('fs').promises;
+const fsSync = require('fs');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
-const CODE_ROOT = path.join(ROOT, 'CP-CODE');
 const OUTPUT = path.join(ROOT, 'data', 'manifest.json');
-const CODE_ROOT_REL = 'CP-CODE';
 
-const relFromRoot = target => path.relative(path.join(ROOT, CODE_ROOT_REL), target).replace(/\\/g, '/');
+// Honor the codeRoot from data/config.json instead of hardcoding it, so the
+// manifest paths stay in sync with what the front-end (scripts/script.js) expects.
+const readCodeRoot = () => {
+    try {
+        const cfg = JSON.parse(fsSync.readFileSync(path.join(ROOT, 'data', 'config.json'), 'utf8'));
+        return cfg.codeRoot || 'CP-CODE';
+    } catch (err) {
+        return 'CP-CODE';
+    }
+};
+
+const CODE_ROOT_REL = readCodeRoot();
+const CODE_ROOT = path.join(ROOT, CODE_ROOT_REL);
+
+const relFromRoot = target => path.relative(CODE_ROOT, target).replace(/\\/g, '/');
 
 const readDirSafe = async dir => {
     try {

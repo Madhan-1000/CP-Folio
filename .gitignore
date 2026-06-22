@@ -1,0 +1,43 @@
+# ---- OS / "flood" junk files ----
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- Node tooling ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+*.log
+
+# ---- Sensitive data / secrets ----
+.env
+.env.*
+*.local
+secrets.json
+*.pem
+*.key
+*.crt
+*.p12
+credentials*.json
+
+# ---- AI / agent local data ----
+.claude/
+
+# ---- Markdown notes / scratch (keep the project README) ----
+*.md
+!README.md
